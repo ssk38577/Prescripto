@@ -9,10 +9,10 @@ import stripe from "stripe";
 import razorpay from 'razorpay';
 
 // Gateway Initialize
-const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
+const stripeInstance = new stripe(meta.env.STRIPE_SECRET_KEY)
 const razorpayInstance = new razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: meta.env.RAZORPAY_KEY_ID,
+    key_secret: meta.env.RAZORPAY_KEY_SECRET,
 })
 
 // API to register user
@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
 
         const newUser = new userModel(userData)
         const user = await newUser.save()
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+        const token = jwt.sign({ id: user._id }, meta.env.JWT_SECRET)
 
         res.json({ success: true, token })
 
@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (isMatch) {
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+            const token = jwt.sign({ id: user._id }, meta.env.JWT_SECRET)
             res.json({ success: true, token })
         }
         else {
@@ -250,7 +250,7 @@ const paymentRazorpay = async (req, res) => {
         // creating options for razorpay payment
         const options = {
             amount: appointmentData.amount * 100,
-            currency: process.env.CURRENCY,
+            currency: meta.env.CURRENCY,
             receipt: appointmentId,
         }
 
@@ -297,7 +297,7 @@ const paymentStripe = async (req, res) => {
             return res.json({ success: false, message: 'Appointment Cancelled or not found' })
         }
 
-        const currency = process.env.CURRENCY.toLocaleLowerCase()
+        const currency = meta.env.CURRENCY.toLocaleLowerCase()
 
         const line_items = [{
             price_data: {
